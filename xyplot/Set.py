@@ -1,10 +1,9 @@
 """
 对 axes 进行相应的设置
 """
-from .AbstractCls import AbstractDrawCls, AbstractSetCls
-from .utils import xy_call
+from .AbstractCls import AbstractSetCls
+from .utils import xy_call, XyPlotAdapter
 import matplotlib.pyplot as plt
-from .Adapter import DrawAdapter
 from .SetAxis import SetAxis
 from .DrawContourf import DrawContourf
 
@@ -31,10 +30,11 @@ class SetFigure(AbstractSetCls):
             alpha=figure.set_alpha,  # 画布透明度
 
             legend=figure.legend,   # 添加画布图例
+            title=figure.suptitle,  # 添加画布标题
 
         )
 
-    @xy_call(DrawAdapter)
+    @xy_call(XyPlotAdapter)
     def branch_api(self, figure: plt.Figure, **kwargs):
         """
 
@@ -76,6 +76,7 @@ class SetAxes(AbstractSetCls):
             streamplot=axes.streamplot,    # 绘制流线
             plot=axes.plot,  # 绘制折线
             scatter=axes.scatter,  # 绘制散点
+            fill=axes.fill,
 
             title=axes.set_title,  # 添加图形内容的标题
             xlabel=axes.set_xlabel,    # 设置x轴标签文本
@@ -93,7 +94,7 @@ class SetAxes(AbstractSetCls):
             set_aspect=axes.set_aspect,    # 设置子区域的横纵比
         )
 
-    @xy_call(DrawAdapter)
+    @xy_call(XyPlotAdapter)
     def branch_api(self, axes, **kwargs):
         """
         组合接口
@@ -102,35 +103,29 @@ class SetAxes(AbstractSetCls):
         :return:
         """
         return dict(
-            contourf=(DrawContourf, axes),
-            patches=(DrawPatches, axes),
-            axis=(SetAxis, axes)
+            contourf=(DrawContourf, axes),  # 绘制带色卡的填色图
+            patches=(SetPatches, axes),     # 绘制几何图形
+            axis=(SetAxis, axes)    # 设置坐标轴: 包括轴脊、刻度线、刻度标签等
 
         )
 
 
-class DrawPatches(AbstractDrawCls):
+class SetPatches(AbstractSetCls):
     """
 
     """
-    def __init__(self, axes, **kwargs):
-        """
 
-        :param axes:
-        :param kwargs:
-        """
-        self._axes = axes
-        self._draw(axes, **kwargs)
-
-    @xy_call(DrawAdapter)
-    def _draw(self, axes, **kwargs):
+    @xy_call(XyPlotAdapter)
+    def native_api(self, axes, **kwargs):
         return dict(
-            circle=(self.draw_circle, axes),
-            ellipse=(self.draw_ellipse, axes),
-            rectangle=(self.draw_rectangle, axes),
-            arc=(self.draw_arc, axes),
-            wedge=(self.draw_wedge, axes)
+            circle=(self.draw_circle, axes),    # 绘制圆
+            ellipse=(self.draw_ellipse, axes),  # 绘制椭圆
+            rectangle=(self.draw_rectangle, axes),  # 绘制矩形
+            arc=(self.draw_arc, axes),  # 绘制圆弧
+            wedge=(self.draw_wedge, axes),  # 绘制楔形
         )
+
+    def branch_api(self, module, **kwargs): ...
 
     @staticmethod
     def draw_circle(axes, **kwargs):

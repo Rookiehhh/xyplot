@@ -1,6 +1,6 @@
 from .AbstractCls import AbstractSetCls
 from .utils import xy_call
-from .Adapter import DrawAdapter
+from .Adapter import XyPlotAdapter
 
 
 class SetAxis(AbstractSetCls):
@@ -10,25 +10,25 @@ class SetAxis(AbstractSetCls):
     @xy_call()
     def branch_api(self, axes, **kwargs): ...
 
-    @xy_call(DrawAdapter)
+    @xy_call(XyPlotAdapter)
     def native_api(self, axes, **kwargs):
         """"""
         return dict(
-            spines=(SetSpines, axes.spines),
-            xaxis=(SetXyAxis, axes.xaxis),
-            yaxis=(SetXyAxis, axes.yaxis),
+            spines=(SetSpines, axes.spines),    # 轴脊设置
+            xaxis=(SetXyAxis, axes.xaxis),  # x轴设置
+            yaxis=(SetXyAxis, axes.yaxis),  # y轴设置
         )
 
 
 class SetSpines(AbstractSetCls):
 
-    @xy_call(DrawAdapter)
+    @xy_call(XyPlotAdapter)
     def native_api(self, spines, **kwargs):
         return dict(
-            top=(self.set_spines, spines['top']),
-            bottom=(self.set_spines, spines['bottom']),
-            right=(self.set_spines, spines['right']),
-            left=(self.set_spines, spines['left']),
+            top=(self.set_spines, spines['top']),   # 顶部轴脊设置
+            bottom=(self.set_spines, spines['bottom']),     # 底部轴脊设置
+            right=(self.set_spines, spines['right']),   # 右侧轴脊设置
+            left=(self.set_spines, spines['left']),     # 左侧轴脊设置
         )
 
     def branch_api(self, spines, **kwargs): ...

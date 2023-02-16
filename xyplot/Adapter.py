@@ -1,5 +1,5 @@
 
-class DrawAdapter:
+class XyPlotAdapter:
     """
     绘图对象适配器
     """

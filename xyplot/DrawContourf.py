@@ -1,5 +1,5 @@
-from .AbstractCls import AbstractSetCls, AbstractDrawCls
-from .utils import method_call, xy_call
+from .AbstractCls import AbstractDrawCls
+from .utils import method_call
 
 
 class DrawContourf(AbstractDrawCls):
@@ -58,6 +58,8 @@ class DrawColorBar(AbstractDrawCls):
 
     def _draw(self, axes, **kwargs):
         cbar_ax_dict = None if 'ax' not in kwargs else kwargs.pop('ax')
+        if 'ax' not in kwargs:
+            kwargs['ax'] = axes
         self.cbar = method_call(axes.figure.colorbar, kwargs)
         if cbar_ax_dict is not None:
             self._set_cbar_ax(cbar_ax_dict)

@@ -1,6 +1,6 @@
 from functools import wraps
 from typing import Union
-from .Adapter import DrawAdapter
+from .Adapter import XyPlotAdapter
 
 
 def merge(dict_1, dict_2):
@@ -43,11 +43,11 @@ def xy_call(adapter=None):
                 for key in obj_map.keys():
                     if key in kwargs:
                         method_call(obj_map[key], kwargs[key])
-            elif issubclass(adapter, DrawAdapter):  # 当使用 DrawAdapter 适配器时
+            elif issubclass(adapter, XyPlotAdapter):  # 当使用 XyPlotAdapter 适配器时
                 for key in obj_map.keys():
                     if key in kwargs:
                         obj, axes = obj_map[key]
-                        method_call(DrawAdapter, kwargs[key], obj, axes)
+                        method_call(XyPlotAdapter, kwargs[key], obj, axes)
             else:
                 raise TypeError(
                     f"{adapter!r} TypeError"
@@ -55,6 +55,9 @@ def xy_call(adapter=None):
 
         return inner
     return decorator
+
+
+ARGS_NAME = 'args'  # args 接口输入args参数的配置命名
 
 
 def method_call(obj, parameter: Union[dict, tuple, list, ], *args):
@@ -68,11 +71,11 @@ def method_call(obj, parameter: Union[dict, tuple, list, ], *args):
     call_args = list(args)
     # 当parameter是字典类型时
     if isinstance(parameter, dict):
-        if 'args' in parameter.keys():
-            if isinstance(parameter['args'], (list, tuple)):
-                call_args.extend(parameter.pop('args'))
+        if ARGS_NAME in parameter.keys():
+            if isinstance(parameter[ARGS_NAME], (list, tuple)):
+                call_args.extend(parameter.pop(ARGS_NAME))
             else:
-                call_args.append(parameter.pop('args'))
+                call_args.append(parameter.pop(ARGS_NAME))
         ret_obj = obj(*call_args, **parameter)
     # 当parameter是数组时, 进行遍历调度(递归)
     elif isinstance(parameter, (list, tuple)):
@@ -83,3 +86,4 @@ def method_call(obj, parameter: Union[dict, tuple, list, ], *args):
         ret_obj = obj(parameter) if len(args) == 0 else obj(parameter, *args)
 
     return ret_obj
+

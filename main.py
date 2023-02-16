@@ -1,14 +1,18 @@
-from xyplot.Set import SetAxes, SetFigure
-import matplotlib.pyplot as plt
+from xyplot import XyPlot, SetAxes, SetFigure
 import numpy as np
 import pandas as pd
 from scipy.interpolate import griddata
-from pprint import pprint
-import matplotlib as mpl
-#
-# print(mpl.rcParams)
-# exit()
-# mpl.rcParams['text.color'] = 'w'
+from math import atan2, sqrt
+
+
+def to_polar(x, y):
+    # 把笛卡尔坐标转化为极坐标
+    print(x.shape)
+    ret_x, ret_y = [], []
+    for xi, yi in zip(x, y):
+        ret_x.append(sqrt(xi**2+yi**2))
+        ret_y.append(atan2(yi, xi))
+    return np.array(ret_x), np.array(ret_y)
 
 
 def read_data(file):
@@ -29,7 +33,7 @@ def read_data(file):
 file = r"P-L1-IMM-SWMF_20221018004619_0005M_SWMF.dat"
 df = read_data(file)
 # print(df.keys())
-x, y = df['X [R]'], df['Y [R]']
+x, y = df['X [R]'].values, df['Y [R]'].values
 xx = yy = np.linspace(-6.5, 6.5, 1000)
 X, Y = np.meshgrid(xx, yy)
 grid_data = griddata((x, y), df[df.keys()[7]].values, (X, Y), method="linear")  # 散点插值成网格数据
@@ -66,6 +70,9 @@ cfg = dict(
     scatter=dict(args=([0, 1, -3, ], [.4, -.7, -.9]), label='scatter', color='r'),
     streamplot=dict(args=(X, Y, grid_data, grid_data), density=1.5, linewidth=0.5, arrowsize=0.9, arrowstyle='->'),
     set_aspect=True,
+    # fill=(
+    #     dict(args=([0, 1, 1, ], [0, -np.pi/2, np.pi/2, ]), c='k'),
+    # ),
     branch=dict(
         contourf=dict(
             contourf=dict(args=(X, Y, grid_data),
@@ -106,26 +113,50 @@ cfg = dict(
     )
 )
 
+
 fig_dit = dict(
     height=10, width=10, facecolor='w', edgecolor='r',
     legend=dict(
         loc='upper right'
     ),
     frameon=True,
+    title=dict(args='XY PLOT',),
     branch=dict(
     )
 )
-
-fig = plt.figure()
-ax = fig.add_axes(plt.axes())
+import copy
+axes_dict = dict(
+    set_fig=fig_dit,
+    axes=dict(
+        init=(221, 222),
+        axes=(cfg, cfg,)
+    ),
+    # axes=dict(
+        # init=(221, 222, 223, 224),
+        # axes=(cfg,
+        #       dict(plot=dict(args=(x, y), label=r'$y = \sin(x)$', c='k'), ),
+        #       dict(scatter=dict(args=([0, 1, -3, ], [.4, -.7, -.9]), label='scatter', color='r'),),
+        #       {}
+        #       )
+    # )
+)
 import time
 t = time.time()
-SetAxes(ax, **cfg)
-SetFigure(fig, **fig_dit)
+# fig = plt.figure()
+# ax1 = plt.subplot(121)
+# ax2 = plt.subplot(122)
+# SetAxes(ax1, **dict(xlabel="XXX"))
+# SetAxes(ax2, **dict(plot=dict(args=(x, y), label=r'$y = \sin(x)$', c='k'), ))
+# plt.show()
+# plt.show()
+xy_plot = XyPlot(**axes_dict)
+print(time.time() - t)
+xy_plot.show()
+# SetAxes(ax, **cfg)
+# SetFigure(fig, **fig_dit)
 
 # ax1 = fig.add_axes(polar=True)
 # cset = ax.contourf(X, Y, grid_data, cmap='hot', levels=np.linspace(0, 30, 100),)
 # cbar = fig.colorbar(cset, shrink=0.8,)
-print(time.time() - t)
 # pprint(fig.__dict__)
-plt.show()
+# plt.show()
