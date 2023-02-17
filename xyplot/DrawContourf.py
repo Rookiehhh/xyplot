@@ -1,8 +1,17 @@
-from .AbstractCls import AbstractDrawCls
-from .utils import method_call
+from .AbstractCls import AbstractDrawCls, ModuleSetter
+from .utils import method_call, xy_call
+from .Adapter import XyPlotAdapter
+from .cfg_names import INIT_NAME
+
+__author__ = 'Rookie'
+__all__ = [
+    'ContourfDirector',     # 绘制contourf 等高线填色图(该模块的顶层设置者)
+    'ColorMapBuilder',      # 色阶颜色映射 colormap 构建设置类
+    'DrawColorBar',         # 色卡构建设置类对象
+]
 
 
-class DrawContourf(AbstractDrawCls):
+class ContourfDirector(AbstractDrawCls):
     """
     绘制等高线填充图
     """
@@ -22,48 +31,66 @@ class DrawContourf(AbstractDrawCls):
         :return:
         """
         # 进行绘制
-        if 'contourf' in kwargs:
+        if INIT_NAME in kwargs:
             # 取出颜色映射配置并进行设置
-            if 'cmap' in kwargs['contourf']:
-                kwargs['contourf']['cmap'] = BuildColorMap(kwargs['contourf']['cmap'])()
-            cset = method_call(axes.contourf, kwargs['contourf'])
+            if 'cmap' in kwargs[INIT_NAME]:
+                kwargs[INIT_NAME]['cmap'] = ColorMapBuilder(kwargs[INIT_NAME]['cmap'])()
+            cset = method_call(axes.contourf, kwargs[INIT_NAME])
             if 'cbar' in kwargs:
-                kwargs['cbar'] = dict(mappable=cset, **kwargs['cbar'])
-                DrawColorBar(axes, **kwargs['cbar'])
+                if isinstance(kwargs['cbar'], dict):
+                    kwargs['cbar'][INIT_NAME] = dict(mappable=cset, **kwargs['cbar'][INIT_NAME], ax=axes)
+                    DrawColorBar(axes.figure.colorbar, **kwargs['cbar'])
 
 
-class BuildColorMap:
+class ColorMapBuilder:
     """
     建造颜色映射
     """
     def __init__(self, parameter):
-        self._cmap = parameter
-        self._set()
+        # 默认色卡映射为jet
+        self.colormap = "jet"
+        # 当传入cmap设置信息为str时
+        if isinstance(parameter, str):
+            self.colormap = parameter
+        # 当传入cmap设置信息为字典时, 如下
+        elif isinstance(parameter, dict):
+            if INIT_NAME not in parameter and not isinstance(parameter[INIT_NAME], dict):
+                raise Exception(
+                    f"{INIT_NAME!r} must exist and is of dict type"
+                )
+            else:
+                init = parameter.pop(INIT_NAME)
+                self.colormap = self.create_colormap(**init)
+                self.native_api(self.colormap, **parameter)
+        else:
+            raise TypeError()
 
     def __call__(self, *args, **kwargs):
-        return self._cmap
+        return self.colormap
 
-    def _set(self, **kwargs): ...
+    @staticmethod
+    def create_colormap(**kwargs):
+        method = 'linear' if 'method' not in kwargs else kwargs['method']
+        if method == 'linear':
+            from matplotlib.colors import LinearSegmentedColormap
+            return method_call(LinearSegmentedColormap.from_list, kwargs)
 
-    def native_api(self, module, **kwargs): ...
+    @xy_call()
+    def native_api(self, colormap, **kwargs):
+        return dict(
+            set_under=colormap.set_under,   # 低于色阶时的映射颜色
+            set_over=colormap.set_over,     # 高于色阶时的映射颜色
+        )
+
+
+class DrawColorBar(ModuleSetter):
+    """设置色卡"""
+
+    @xy_call(XyPlotAdapter)
+    def native_api(self, c_bar, **kwargs):
+        from .Set import SetAxes
+        return dict(
+            ax=(SetAxes, c_bar.ax),
+        )
 
     def branch_api(self, module, **kwargs): ...
-
-
-class DrawColorBar(AbstractDrawCls):
-
-    def __init__(self, axes, **kwargs):
-        self._axes = axes
-        self._draw(axes, **kwargs)
-
-    def _draw(self, axes, **kwargs):
-        cbar_ax_dict = None if 'ax' not in kwargs else kwargs.pop('ax')
-        if 'ax' not in kwargs:
-            kwargs['ax'] = axes
-        self.cbar = method_call(axes.figure.colorbar, kwargs)
-        if cbar_ax_dict is not None:
-            self._set_cbar_ax(cbar_ax_dict)
-
-    def _set_cbar_ax(self, cbar_ax_dict):
-        from .Set import SetAxes
-        SetAxes(self.cbar.ax, **cbar_ax_dict)

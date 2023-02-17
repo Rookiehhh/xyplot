@@ -1,18 +1,7 @@
-from xyplot import XyPlot, SetAxes, SetFigure
+from xyplot import XyPlot
 import numpy as np
 import pandas as pd
 from scipy.interpolate import griddata
-from math import atan2, sqrt
-
-
-def to_polar(x, y):
-    # 把笛卡尔坐标转化为极坐标
-    print(x.shape)
-    ret_x, ret_y = [], []
-    for xi, yi in zip(x, y):
-        ret_x.append(sqrt(xi**2+yi**2))
-        ret_y.append(atan2(yi, xi))
-    return np.array(ret_x), np.array(ret_y)
 
 
 def read_data(file):
@@ -46,49 +35,38 @@ cfg = dict(
     title=dict(args="SIN(X)", loc='left'),
     xlabel=dict(args="x label", c='k'),
     ylabel=dict(args=r'$\sin(x)$', c='k'),
-    legend=dict(
-        loc='upper right',
-    ),
-    annotate=dict(
-        text='Hello',
-        xy=(0.3, 0.3),
-        xytext=(0.5, 0.5),
-        weight='bold',
-        color='b',
-        arrowprops=dict(arrowstyle='->', connectionstyle='arc3', color='b')
-    ),
-    grid=dict(linestyle=':', color='r'),
-    text=(
-        dict(args=(-3.0, 0.0, "TEXT"), weight='bold', color='r', fontsize=20, fontfamily='sans-serif'),
-        dict(args=(0.5, 0., "text"), weight='bold', color='g', fontsize=20, fontfamily='sans-serif'),
-    ),
-    axhline=dict(y=0, c='g', ls='--', lw=2),
-    axvline=dict(x=0, c='c', ls='-.', lw=2),
-    axvspan=dict(xmin=1.0, xmax=2.0, facecolor='y', alpha=0.1),
-    axhspan=dict(ymin=0.1, ymax=0.4, facecolor='r', alpha=0.1),
-    plot=dict(args=(x, y), label=r'$y = \sin(x)$', c='k'),
-    scatter=dict(args=([0, 1, -3, ], [.4, -.7, -.9]), label='scatter', color='r'),
+    # legend=dict(
+    #     loc='upper right',
+    # ),
+    # annotate=dict(text='Hello',xy=(0.3, 0.3), xytext=(0.5, 0.5), weight='bold', color='b',
+    #               arrowprops=dict(arrowstyle='->', connectionstyle='arc3', color='b')),
+    # grid=dict(linestyle=':', color='r'),
+    # text=(
+    #     dict(args=(-3.0, 0.0, "TEXT"), weight='bold', color='r', fontsize=20, fontfamily='sans-serif'),
+    #     dict(args=(0.5, 0., "text"), weight='bold', color='g', fontsize=20, fontfamily='sans-serif'),
+    # ),
+    # axhline=dict(y=0, c='g', ls='--', lw=2),
+    # axvline=dict(x=0, c='c', ls='-.', lw=2),
+    # axvspan=dict(xmin=1.0, xmax=2.0, facecolor='y', alpha=0.1),
+    # axhspan=dict(ymin=0.1, ymax=0.4, facecolor='r', alpha=0.1),
+    # plot=dict(args=(x, y), label=r'$y = \sin(x)$', c='k'),
+    # scatter=dict(args=([0, 1, -3, ], [.4, -.7, -.9]), label='scatter', color='r'),
     streamplot=dict(args=(X, Y, grid_data, grid_data), density=1.5, linewidth=0.5, arrowsize=0.9, arrowstyle='->'),
     set_aspect=True,
     # fill=(
     #     dict(args=([0, 1, 1, ], [0, -np.pi/2, np.pi/2, ]), c='k'),
     # ),
-    branch=dict(
+    Branch=dict(
         contourf=dict(
-            contourf=dict(args=(X, Y, grid_data),
-                          levels=np.linspace(0, 30, 50),
-                          cmap='hot',),
+            init=dict(args=(X, Y, grid_data), levels=np.linspace(0, 30, 50), extend="both", cmap=dict(
+                              init=dict(
+                                  name='chaos',
+                                  colors=['black', 'purple', 'blue', 'cyan', 'green', 'yellow', 'orange', 'red'], N=100),
+                              set_under='k', set_over='r'),
+                      ),
             cbar=dict(
-                shrink=0.8,
-                ticks=np.linspace(0, 30, 11),
-                ax=dict(
-                    title=dict(
-                        args='title',
-                        c='y'
-                    ),
-                    xlabel='123',
-                    ylabel='EEE',
-                )
+                init=dict(shrink=0.8, ticks=np.linspace(0, 30, 11),),
+                ax=dict(title=dict(args='title', c='y'), xlabel='123', ylabel='EEE',)
             )
         ),
         patches=dict(
@@ -98,65 +76,36 @@ cfg = dict(
             )
         ),
         axis=dict(
-            spines=dict(
-                top=dict(
-                    set_position=dict(args=(('data', 0), )),
-                    set_color='b',
-
-                )
-            ),
-            xaxis=dict(
-                set_label_coords=dict(args=(1, -0.05), ),
-                set_tick_params=dict(color='b'),
-            )
-        )
+            spines=dict(top=dict(set_position=dict(args=(('data', 0), )), set_color='b')),
+            xaxis=dict(set_label_coords=dict(args=(1, -0.05), ), set_tick_params=dict(color='b'),))
     )
 )
 
 
-fig_dit = dict(
-    height=10, width=10, facecolor='w', edgecolor='r',
-    legend=dict(
-        loc='upper right'
-    ),
-    frameon=True,
-    title=dict(args='XY PLOT',),
-    branch=dict(
-    )
-)
-import copy
+fig_dit = dict(height=10, width=10,
+               # facecolor='k', edgecolor='k',
+               legend=dict(loc='upper right'), frameon=True, title=dict(args='XY PLOT',),)
+set_rc = {
+    'figure.facecolor': 'k', 'axes.labelcolor': 'w', 'axes.titlecolor': 'w', 'ytick.color': 'w', 'xtick.color': 'w'
+}
 axes_dict = dict(
+    set_rc=set_rc,
     set_fig=fig_dit,
     axes=dict(
-        init=(221, 222),
-        axes=(cfg, cfg,)
+        init=(dict(args=(2, 2, 1), ), 122),
+        axes=(cfg, dict(plot=dict(args=(x, y), color='r', label='???'), legend=dict(loc='lower right'), grid={}))
     ),
-    # axes=dict(
-        # init=(221, 222, 223, 224),
-        # axes=(cfg,
-        #       dict(plot=dict(args=(x, y), label=r'$y = \sin(x)$', c='k'), ),
-        #       dict(scatter=dict(args=([0, 1, -3, ], [.4, -.7, -.9]), label='scatter', color='r'),),
-        #       {}
-        #       )
-    # )
+    add_axes=dict(
+        init=dict(args=[[0.1, 0.1, 0.4, 0.4], ]),
+        axes=[cfg, ]
+    )
 )
+
 import time
 t = time.time()
-# fig = plt.figure()
-# ax1 = plt.subplot(121)
-# ax2 = plt.subplot(122)
-# SetAxes(ax1, **dict(xlabel="XXX"))
-# SetAxes(ax2, **dict(plot=dict(args=(x, y), label=r'$y = \sin(x)$', c='k'), ))
-# plt.show()
-# plt.show()
 xy_plot = XyPlot(**axes_dict)
 print(time.time() - t)
 xy_plot.show()
-# SetAxes(ax, **cfg)
-# SetFigure(fig, **fig_dit)
-
-# ax1 = fig.add_axes(polar=True)
-# cset = ax.contourf(X, Y, grid_data, cmap='hot', levels=np.linspace(0, 30, 100),)
-# cbar = fig.colorbar(cset, shrink=0.8,)
-# pprint(fig.__dict__)
-# plt.show()
+axes_dict.pop('set_rc')
+a = XyPlot(**axes_dict)
+a.show()

@@ -5,4 +5,5 @@ SUBPLOT2GRID_NAME = 'subplot2grid'  # 顶层使用subplot2grid创建axes的配�
 ADD_AXES_NAME = 'add_axes'  # 顶层使用add_axes 创建axes的配置命名
 INIT_NAME = 'init'  # 创建对象初始化信息配置命名
 AXES_NAME = 'axes'  # 子区域设定配置命名
-BRANCH_NAME = "branch"  # 分支配置命名
+BRANCH_NAME = "Branch"  # 分支配置命名: 代指进入自定义配置组合结构
+ARGS_NAME = 'args'  # args 接口输入args参数的配置命名

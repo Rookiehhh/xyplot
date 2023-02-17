@@ -1,31 +1,43 @@
 """
-设计思路:
-    1. 指挥者 Director
-    2.
+
 """
 import copy
 from abc import ABCMeta, abstractmethod
 from typing import Optional
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-from .utils import method_call, XyPlotAdapter
+from .utils import method_call
+from .Adapter import XyPlotAdapter
 from .Set import SetFigure, SetAxes
 from .cfg_names import SET_RC_NAME, AXES_NAME, SUBPLOT_NAME, SUBPLOT2GRID_NAME, SET_FIG_NAME, ADD_AXES_NAME, INIT_NAME
+
+__author__ = 'Rookie'
+__all__ = [
+    'XyPlotDirector',   # 顶层绘图方法
+    'AxesBuilder',      # axes 子区域对象的创建绘制 模板抽象类
+    'SubplotBuilder',   # 使用subplot创建绘制axes子区域类
+    'Subplot2gridBuilder',  # 使用subplot2grid创建绘制axes子区域类
+    'AddAxesBuilder',    # 使用add_axes 创建绘制axes子区域类
+    'SetTempRc',        # 设置临时全局mpl.rcParams
+]
 
 
 class XyPlotDirector:
     """指挥者"""
 
     def __init__(self, **kwargs):
+        kwargs = copy.deepcopy(kwargs)
         self.figure = None
         if len(kwargs):
             self.execute(**kwargs)
 
     def execute(self, **kwargs):
         # 如果存在对matplotlib设置信息的修改
+        tmp_rc = None
         if SET_RC_NAME in kwargs:
-            pass
+            tmp_rc = SetTempRc(**kwargs[SET_RC_NAME])
         # 如果kwargs键中存在AXES_NAME, 则调度subplot方法构建axes子区域集
         if AXES_NAME in kwargs:
             self.figure = SubplotBuilder(self.figure, **kwargs[AXES_NAME])()
@@ -40,13 +52,25 @@ class XyPlotDirector:
             self.figure = AddAxesBuilder(self.figure, **kwargs[ADD_AXES_NAME])()
         # 如果kwargs键中存在SET_FIG_NAME, 则调度SetFigure 方法构建
         if SET_FIG_NAME in kwargs:
+            self.check()
             SetFigure(self.figure, **kwargs[SET_FIG_NAME])
+        if SET_RC_NAME in kwargs:
+            tmp_rc.revert()
 
-    def show(self):
+    @staticmethod
+    def show():
         plt.show()
 
-    def save(self, *args, **kwargs):
+    @staticmethod
+    def save(*args, **kwargs):
         plt.savefig(*args, **kwargs)
+
+    def check(self):
+        """检查"""
+        if self.figure is None:
+            raise TypeError(
+                f"Figure is not created, You need to create at least one axes object to create a canvas"
+            )
 
 
 class AxesBuilder(metaclass=ABCMeta):
@@ -58,8 +82,7 @@ class AxesBuilder(metaclass=ABCMeta):
         """
         根据kwargs构建画布
         """
-        if figure is None:
-            self.figure = plt.figure()
+        self.figure = figure if figure is not None else plt.figure()
         self.execute(**kwargs)
 
     def execute(self, **kwargs):
@@ -102,8 +125,8 @@ class AxesBuilder(metaclass=ABCMeta):
             self.set_axes(ax_lst, set_lst)
         else:
             raise Exception(
-                f"The number of created axes ({len(ax_lst)})"
-                f" is inconsistent with the number of corresponding set information list ({len(set_lst)})"
+                f"The number of created axes (number = {len(ax_lst)})"
+                f" is inconsistent with the number of corresponding set information list ( number = {len(set_lst)})"
             )
 
     def __call__(self, *args, **kwargs):
@@ -157,3 +180,17 @@ class AddAxesBuilder(AxesBuilder):
             ax_lst.append(ax)
         return ax_lst
 
+
+class SetTempRc:
+    def __init__(self, **kwargs):
+        self.Raw_Rc = copy.copy(mpl.rcParams)
+        self.execute(**kwargs)
+
+    @staticmethod
+    def execute(**kwargs):
+        for k, v in kwargs.items():
+            mpl.rcParams[k] = v
+
+    def revert(self):
+        for k, v in self.Raw_Rc.items():
+            mpl.rcParams[k] = v

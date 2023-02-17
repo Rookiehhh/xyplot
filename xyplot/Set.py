@@ -1,14 +1,18 @@
 """
 对 axes 进行相应的设置
 """
-from .AbstractCls import AbstractSetCls
-from .utils import xy_call, XyPlotAdapter
+from .AbstractCls import ModuleSetter
+from .utils import xy_call
+from .Adapter import XyPlotAdapter
 import matplotlib.pyplot as plt
 from .SetAxis import SetAxis
-from .DrawContourf import DrawContourf
+from .DrawContourf import ContourfDirector
+
+__author__ = 'Rookie'
+__all__ = ['SetFigure', 'SetAxes', 'SetPatches']
 
 
-class SetFigure(AbstractSetCls):
+class SetFigure(ModuleSetter):
     """
     功能: 用于对 matplotlib 的 figure 进行设置操作
     """
@@ -47,7 +51,7 @@ class SetFigure(AbstractSetCls):
         )
 
 
-class SetAxes(AbstractSetCls):
+class SetAxes(ModuleSetter):
     """
     # 对 matplotlib 中 axes 子区域中的基本组成元素进行设置
     # :param axes:  plt.Axes object
@@ -103,14 +107,14 @@ class SetAxes(AbstractSetCls):
         :return:
         """
         return dict(
-            contourf=(DrawContourf, axes),  # 绘制带色卡的填色图
+            contourf=(ContourfDirector, axes),  # 绘制带色卡的填色图
             patches=(SetPatches, axes),     # 绘制几何图形
             axis=(SetAxis, axes)    # 设置坐标轴: 包括轴脊、刻度线、刻度标签等
 
         )
 
 
-class SetPatches(AbstractSetCls):
+class SetPatches(ModuleSetter):
     """
 
     """

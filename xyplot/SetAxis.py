@@ -1,9 +1,16 @@
-from .AbstractCls import AbstractSetCls
+from .AbstractCls import ModuleSetter
 from .utils import xy_call
 from .Adapter import XyPlotAdapter
 
+__author__ = 'Rookie'
+__all__ = [
+    'SetAxis',      # axis坐标轴设置类
+    'SetSpines',    # 轴脊设置类
+    'SetXyAxis',    # x、y 轴刻度设置类
+]
 
-class SetAxis(AbstractSetCls):
+
+class SetAxis(ModuleSetter):
     """
 
     """
@@ -20,7 +27,7 @@ class SetAxis(AbstractSetCls):
         )
 
 
-class SetSpines(AbstractSetCls):
+class SetSpines(ModuleSetter):
 
     @xy_call(XyPlotAdapter)
     def native_api(self, spines, **kwargs):
@@ -43,7 +50,7 @@ class SetSpines(AbstractSetCls):
         )
 
 
-class SetXyAxis(AbstractSetCls):
+class SetXyAxis(ModuleSetter):
 
     @xy_call()
     def native_api(self, module, **kwargs):

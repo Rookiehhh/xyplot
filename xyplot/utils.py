@@ -1,6 +1,10 @@
 from functools import wraps
 from typing import Union
 from .Adapter import XyPlotAdapter
+from .cfg_names import ARGS_NAME
+
+__author__ = 'Rookie'
+__all__ = ['merge', 'xy_call', 'method_call']
 
 
 def merge(dict_1, dict_2):
@@ -57,9 +61,6 @@ def xy_call(adapter=None):
     return decorator
 
 
-ARGS_NAME = 'args'  # args 接口输入args参数的配置命名
-
-
 def method_call(obj, parameter: Union[dict, tuple, list, ], *args):
     """
     调度执行对象
@@ -86,4 +87,3 @@ def method_call(obj, parameter: Union[dict, tuple, list, ], *args):
         ret_obj = obj(parameter) if len(args) == 0 else obj(parameter, *args)
 
     return ret_obj
-
