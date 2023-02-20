@@ -52,7 +52,7 @@ cfg = dict(
     # plot=dict(args=(x, y), label=r'$y = \sin(x)$', c='k'),
     # scatter=dict(args=([0, 1, -3, ], [.4, -.7, -.9]), label='scatter', color='r'),
     streamplot=dict(args=(X, Y, grid_data, grid_data), density=1.5, linewidth=0.5, arrowsize=0.9, arrowstyle='->'),
-    set_aspect=True,
+    aspect=True,
     tick_params=dict(axis='x', labelrotation=45, ),
     # fill=(
     #     dict(args=([0, 1, 1, ], [0, -np.pi/2, np.pi/2, ]), c='k'),

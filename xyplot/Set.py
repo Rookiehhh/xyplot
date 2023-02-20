@@ -63,28 +63,96 @@ class SetFigure(ModuleSetter):
 
 class SetAxes(ModuleSetter):
     """
-    # 对 matplotlib 中 axes 子区域中的基本组成元素进行设置
-    # :param axes:  plt.Axes object
-    # :param title: 添加图形内容的标题 -> axes.set_title
-    # :param xlabel: 设置x轴标签文本 -> axes.set_xlabel
-    # :param ylabel: 设置y轴标签文本 -> axes.set_ylabel
-    # :param xlim: 设置x轴数值显示范围 -> axes.set_xlim
-    # :param ylim: 设置y轴数值显示范围 -> axes.set_ylim
-    # :param legend: 设置标示不同图形的文本标签图例 -> axes.legend
-    # :param text: 添加图形内容细节的无指向型注释文本 -> axes.text
-    # :param annotate: 添加图形内容细节的指向型注释文本 -> axes.annotate
-    # :param grid: 绘制刻度线的网格线 -> axes.grid
-    # :param axhspan: 绘制平行于x轴的参考区域 -> axes.axhspan
-    # :param axvspan: 绘制垂直于x轴的参考区域 -> axes.axvspan
-    # :param axhline: 绘制平行于x轴的水平参考线 -> axes.axhline
-    # :param axvline: 绘制垂直于x轴的竖直参考线 -> axes.axvline
+    设置修改axes绘图对象
+    Parameters
+    ----------
+    axes: `matplotlib.Axes
+    kwargs:
+        contourf:
+            API: `matplotlib.Axes.contourf
+            功能: 绘制等高线填充图
+        streamplot:
+            API: `matplotlib.Axes.streamplot
+            功能: 绘制流线
+        plot:
+            API: `matplotlib.Axes.plot
+            功能: 绘制折线
+        scatter:
+            API: `matplotlib.Axes.scatter
+            功能: 绘制散点
+        fill:
+            API: `matplotlib.Axes.fill
+            功能: 绘制散点
+        title:
+            API: `matplotlib.Axes.set_title
+            功能: 添加图形内容的标题
+        xlabel:
+            API: `matplotlib.Axes.set_xlabel
+            功能: 设置x轴标签
+        ylabel:
+            API: `matplotlib.Axes.set_ylabel
+            功能: 设置y轴标签
+        xlim:
+            API: `matplotlib.Axes.set_xlim
+            功能: 设置x轴数值显示范围
+        ylim:
+            API: `matplotlib.Axes.set_xlim
+            功能: 设置y轴数值显示范围
+        xticks:
+            API: `matplotlib.Axes.set_xticks
+            功能: 设置x轴上的刻度位置
+        yticks:
+            API: `matplotlib.Axes.set_xticks
+            功能: 设置y轴上的刻度位置
+        xticklabels:
+            API: `matplotlib.Axes.set_xticklabels
+            功能: 设置x轴上的刻度标签文本
+        yticklabels:
+            API: `matplotlib.Axes.set_yticklabels
+            功能: 设置y轴上的刻度标签文本
+        legend:
+            API: `matplotlib.Axes.legend
+            功能: 设置标示不同图形的文本标签图例
+        text:
+            API: `matplotlib.Axes.text
+            功能: 添加图形内容细节的无指向型注释文本
+        annotate:
+            API: `matplotlib.Axes.annotate
+            功能: 添加图形内容细节的指向型注释文本
+        grid:
+            API: `matplotlib.Axes.grid
+            功能: 绘制刻度线的网格线
+        axhspan:
+            API: `matplotlib.Axes.axhspan
+            功能: 绘制平行于x轴的参考区域
+        axvspan:
+            API: `matplotlib.Axes.axvspan
+            功能: 绘制垂直于x轴的参考区域
+        axhline:
+            API: `matplotlib.Axes.axhline
+            功能: 绘制平行于x轴的水平参考线
+        axvline:
+            API: `matplotlib.Axes.axvline
+            功能: 绘制垂直于x轴的竖直参考线
+        axvline:
+            API: `matplotlib.Axes.axvline
+            功能: 绘制垂直于x轴的竖直参考线
+        axvline:
+            API: `matplotlib.Axes.axvline
+            功能: 绘制垂直于x轴的竖直参考线
+        aspect:
+            API: `matplotlib.Axes.set_aspect
+            功能: 设置子区域的横纵比
+        tick_params:
+            API: `matplotlib.Axes.tick_params
+            功能: 设置刻度标签、刻度线、网格线等
+    Returns
+    -------
+
     """
 
     @xy_call()
     def native_api(self, axes, **kwargs):
-        """
-        将配置信息分配给Axes实例化对象中的对应方法进行设置
-        """
         return dict(
             contourf=axes.contourf,  # 绘制等高线填充图
             streamplot=axes.streamplot,    # 绘制流线
@@ -109,25 +177,16 @@ class SetAxes(ModuleSetter):
             axvspan=axes.axvspan,  # 绘制垂直于x轴的参考区域
             axhline=axes.axhline,  # 绘制平行于x轴的水平参考线
             axvline=axes.axvline,  # 绘制垂直于x轴的竖直参考线
-            set_aspect=axes.set_aspect,    # 设置子区域的横纵比
+            aspect=axes.set_aspect,    # 设置子区域的横纵比
             tick_params=axes.tick_params,   # 设置刻度标签、刻度线、网格线等
-
         )
 
     @xy_call(XyPlotAdapter)
     def branch_api(self, axes, **kwargs):
-        """
-        组合接口
-        :param axes:
-        :param kwargs:
-        :return:
-        """
         return dict(
             contourf=(ContourfDirector, axes),  # 绘制带色卡的填色图
             patches=(SetPatches, axes),     # 绘制几何图形
             axis=(SetAxis, axes)    # 设置坐标轴: 包括轴脊、刻度线、刻度标签等
-
-
         )
 
 

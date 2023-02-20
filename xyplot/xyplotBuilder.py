@@ -135,7 +135,13 @@ class AxesBuilder(metaclass=ABCMeta):
 
     def __init__(self, figure: Optional[plt.Figure] = None, **kwargs):
         """
-        根据kwargs构建画布
+        添加子区域绘图对象并对其进行设置与绘制 抽象模板方法类
+        Parameters
+        ----------
+        figure: 画布对象, 如果传入为None, 则自动创建
+        kwargs:
+            1. axes and init, 适用于绘制多个子区域图
+            2. 等同于 SetAxes类 的 kwargs 可选参数
         """
         self.figure = figure if figure is not None else plt.figure()
         self.execute(**kwargs)
