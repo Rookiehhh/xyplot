@@ -63,7 +63,7 @@ cfg = dict(
                               init=dict(
                                   name='chaos',
                                   colors=['black', 'purple', 'blue', 'cyan', 'green', 'yellow', 'orange', 'red'], N=100),
-                              set_under='k', set_over='r'),
+                              under='k', over='r'),
                       ),
             cbar=dict(
                 init=dict(shrink=0.8, ticks=np.linspace(0, 30, 11), orientation='horizontal'),
@@ -77,8 +77,8 @@ cfg = dict(
             )
         ),
         axis=dict(
-            spines=dict(top=dict(set_position=dict(args=(('data', 0), )), set_color='b')),
-            xaxis=dict(set_label_coords=dict(args=(1, -0.05), ), set_tick_params=dict(color='b'),))
+            spines=dict(top=dict(position=dict(args=(('data', 0), )), color='b')),
+            xaxis=dict(label_coords=dict(args=(1, -0.05), ), tick_params=dict(color='b'),))
     )
 )
 

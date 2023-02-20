@@ -1,6 +1,3 @@
-"""
-
-"""
 import copy
 from abc import ABCMeta, abstractmethod
 from typing import Optional
@@ -25,16 +22,71 @@ __all__ = [
 
 
 class XyPlotDirector:
-    """指挥者"""
+    """
+    蜥蜴绘图(Xi Yi Plot)
+        针对气象行业主要的绘图场景, 专门设计的绘图封装库。 其研发的主要目的包括：
+            1. 简化绘图方法, 降低绘图代码量
+            2. 便于绘图代码的封装分类, 提高其复用性和维护性
+            3. 更好地支持通过外部配置文件对单独的可视化产品进行个性化定制
+            4. 为未来的绘图GUI/Web配置化打下基础, 以实现未来可视化工作的无代码化
+        其中, 'xy' 既可以理解为其绘制的图形主要是二维笛卡尔坐标的, 也可以理解为它是由云蜥数字科技研发
+    Parameters
+    ----------
+    kwargs:
+        set_rc:
+            dict类型, 修改mpl.rcParams, 会在绘图对象绘图完成后恢复到原本的设置
+        set_fig:
+            dict类型, 设置画布信息
+        axes:
+            dict类型,子区域axes对象绘图信息
+        subplot:
+            dict类型, 使用subplot创建axes对象并绘图, 内部包含两个键分别为 init and axes.
+            init 用于初始化subplot创建axes对象, axes 包含绘图对象的绘图信息, 具体使用方法
+            和顶层axes一致
+        subplot2grid:
+            dict类型， 使用subplot2grid创建axes对象并绘图, 具体使用方法与subplot同理
+        add_axes:
+            dict类型， 使用add_axes创建axes对象并绘图, 具体使用方法与subplot同理
+    -------
+    Example
+        1. 绘制单个axes对象
+            >>> import numpy as np
+            >>> x = np.linspace(-np.pi, np.pi, 100)
+            >>> y = np.sin(x)
+            >>> set_fig_dict = dict(height=10,width=10)
+            >>> axes_dict = dict(plot=dict(args=(x, y), label='y=sin(x)', c='k'), title=r'y=sin(x)')
+            >>> set_rc_dict = {'figure.facecolor': 'k', 'axes.labelcolor': 'w',
+            >>> 'axes.titlecolor': 'w', 'ytick.color': 'w', 'xtick.color': 'w'}
+            >>> cfg = dict(set_rc=set_rc_dict, set_fig=set_fig_dict, axes=axes_dict)
+            >>> xyplt = XyPlotDirector(**cfg)
+            >>> xyplt.show()
+        2. 绘制多个axes对象
+            >>> import numpy as np
+            >>> x = np.linspace(-np.pi, np.pi, 100)
+            >>> y1 = np.sin(x)
+            >>> y2 = np.cos(x)
+            >>> ax1_dict = dict(plot=dict(args=(x, y1), color='r', lw=2), title='y1= sin(x)')
+            >>> ax2_dict = dict(scatter=dict(args=(x, y2), color='r', lw=2), title='y2= cos(x)')
+            >>> subplot_dict = dict(
+            >>>                 init=(121, 122),
+            >>>                 axes=(ax1_dict, ax2_dict)
+            >>>                )
+            >>> XyPlotDirector(subplot=subplot_dict).save('test.png')
+
+    -------
+    Returns
+    -------
+
+    """
 
     def __init__(self, **kwargs):
-        kwargs = copy.deepcopy(kwargs)
+        kwargs = copy.deepcopy(kwargs)  # 由于执行该class时会修改kwargs内容, 所以要对其进行深拷贝
         self.figure = None
         if len(kwargs):
             self.execute(**kwargs)
 
     def execute(self, **kwargs):
-        # 如果存在对matplotlib设置信息的修改
+        # 修改mpl.rcParams
         tmp_rc = None
         if SET_RC_NAME in kwargs:
             tmp_rc = SetTempRc(**kwargs[SET_RC_NAME])
@@ -51,18 +103,21 @@ class XyPlotDirector:
         if ADD_AXES_NAME in kwargs:
             self.figure = AddAxesBuilder(self.figure, **kwargs[ADD_AXES_NAME])()
         # 如果kwargs键中存在SET_FIG_NAME, 则调度SetFigure 方法构建
-        self.check()
+        self.check()    # 在设置画布前先进行检查figure对象是否已经创建
         if SET_FIG_NAME in kwargs:
             SetFigure(self.figure, **kwargs[SET_FIG_NAME])
+        # 还原原有的mpl.rcParams
         if SET_RC_NAME in kwargs:
             tmp_rc.revert()
 
     @staticmethod
     def show():
+        """显示画布"""
         plt.show()
 
     @staticmethod
     def save(*args, **kwargs):
+        """保存画布"""
         plt.savefig(*args, **kwargs)
 
     def check(self):
@@ -182,15 +237,20 @@ class AddAxesBuilder(AxesBuilder):
 
 
 class SetTempRc:
+    """
+    修改mpl.rcParams
+    """
     def __init__(self, **kwargs):
         self.Raw_Rc = copy.copy(mpl.rcParams)
         self.execute(**kwargs)
 
     @staticmethod
     def execute(**kwargs):
+        """执行修改"""
         for k, v in kwargs.items():
             mpl.rcParams[k] = v
 
     def revert(self):
+        """恢复原有设置"""
         for k, v in self.Raw_Rc.items():
             mpl.rcParams[k] = v

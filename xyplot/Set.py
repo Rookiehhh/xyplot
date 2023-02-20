@@ -9,7 +9,10 @@ from .SetAxis import SetAxis
 from .DrawContourf import ContourfDirector
 
 __author__ = 'Rookie'
-__all__ = ['SetFigure', 'SetAxes', 'SetPatches']
+__all__ = ['SetFigure',     # 设置画布
+           'SetAxes',       # 设置子区域绘图对象
+           'SetPatches'     # 设置添加几何图形
+           ]
 
 
 class SetFigure(ModuleSetter):
@@ -55,20 +58,7 @@ class SetFigure(ModuleSetter):
 
     @xy_call(XyPlotAdapter)
     def branch_api(self, figure: plt.Figure, **kwargs):
-        """
-
-        Parameters
-        ----------
-        figure: 画布对象plt.Figure
-        kwargs
-
-        Returns
-        -------
-
-        """
-        return dict(
-
-        )
+        return dict()
 
 
 class SetAxes(ModuleSetter):

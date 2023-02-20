@@ -13,32 +13,36 @@ __all__ = [
 
 class ContourfDirector(AbstractDrawCls):
     """
-    绘制等高线填充图
+    contourf等高线填充图绘制对象
+    Parameters
+    ----------
+    axes: 子区域·matplotlib.Axes对象
+    kwargs:
+        init: 初始化创建`axes.contourf 对象
+        cbar: 创建对应的色卡
+
+    Returns
+    -------
+
     """
     def __init__(self, axes, **kwargs):
-        """
-        :param axes: plt.Axes
-        """
         self.axes = axes
         self._draw(axes, **kwargs)
 
     @staticmethod
     def _draw(axes, **kwargs):
-        """
-
-        :param axes:
-        :param kwargs:
-        :return:
-        """
         # 进行绘制
         if INIT_NAME in kwargs:
             # 取出颜色映射配置并进行设置
             if 'cmap' in kwargs[INIT_NAME]:
                 kwargs[INIT_NAME]['cmap'] = ColorMapBuilder(kwargs[INIT_NAME]['cmap'])()
             cset = method_call(axes.contourf, kwargs[INIT_NAME])
+            # 绘制对应的色卡
             if 'cbar' in kwargs:
                 if isinstance(kwargs['cbar'], dict):
+                    # 将axes 对象添加到 cbar 的配置参数中去（使其能够放置在cbar旁边）
                     kwargs['cbar'][INIT_NAME] = dict(mappable=cset, **kwargs['cbar'][INIT_NAME], ax=axes)
+                    # 创建并设置colorbar
                     DrawColorBar(axes.figure.colorbar, **kwargs['cbar'])
 
 
@@ -78,8 +82,8 @@ class ColorMapBuilder:
     @xy_call()
     def native_api(self, colormap, **kwargs):
         return dict(
-            set_under=colormap.set_under,   # 低于色阶时的映射颜色
-            set_over=colormap.set_over,     # 高于色阶时的映射颜色
+            under=colormap.set_under,   # 低于色阶时的映射颜色
+            over=colormap.set_over,     # 高于色阶时的映射颜色
         )
 
 
