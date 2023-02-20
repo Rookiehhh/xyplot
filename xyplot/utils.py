@@ -1,5 +1,6 @@
 from functools import wraps
 from typing import Union
+
 from .Adapter import XyPlotAdapter
 from .cfg_names import ARGS_NAME
 
@@ -64,8 +65,15 @@ def xy_call(adapter=None):
 def method_call(obj, parameter: Union[dict, tuple, list, ], *args):
     """
     调度执行对象
-    :param obj: 调度执行对象
-    :param parameter: 执行参数信息
+    Parameters
+    ----------
+    obj: 调度执行的对象
+    parameter: 执行时传入的关键字参数以及部分无关键字参数
+    args: 执行时传入的无关键字参数
+
+    Returns
+    -------
+
     """
     # 定义调度方法的返回值
     ret_obj = None

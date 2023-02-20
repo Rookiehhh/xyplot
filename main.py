@@ -53,6 +53,7 @@ cfg = dict(
     # scatter=dict(args=([0, 1, -3, ], [.4, -.7, -.9]), label='scatter', color='r'),
     streamplot=dict(args=(X, Y, grid_data, grid_data), density=1.5, linewidth=0.5, arrowsize=0.9, arrowstyle='->'),
     set_aspect=True,
+    tick_params=dict(axis='x', labelrotation=45, ),
     # fill=(
     #     dict(args=([0, 1, 1, ], [0, -np.pi/2, np.pi/2, ]), c='k'),
     # ),
@@ -65,7 +66,7 @@ cfg = dict(
                               set_under='k', set_over='r'),
                       ),
             cbar=dict(
-                init=dict(shrink=0.8, ticks=np.linspace(0, 30, 11),),
+                init=dict(shrink=0.8, ticks=np.linspace(0, 30, 11), orientation='horizontal'),
                 ax=dict(title=dict(args='title', c='y'), xlabel='123', ylabel='EEE',)
             )
         ),
@@ -89,16 +90,18 @@ set_rc = {
     'figure.facecolor': 'k', 'axes.labelcolor': 'w', 'axes.titlecolor': 'w', 'ytick.color': 'w', 'xtick.color': 'w'
 }
 axes_dict = dict(
-    set_rc=set_rc,
+    # set_rc=set_rc,
     set_fig=fig_dit,
     axes=dict(
-        init=(dict(args=(2, 2, 1), ), 122),
-        axes=(cfg, dict(plot=dict(args=(x, y), color='r', label='???'), legend=dict(loc='lower right'), grid={}))
+        # init=(dict(args=(2, 2, 1), ), 122),
+        axes=(cfg,
+              # dict(plot=dict(args=(x, y), color='r', label='???'), legend=dict(loc='lower right'), grid={})
+              )
     ),
-    add_axes=dict(
-        init=dict(args=[[0.1, 0.1, 0.4, 0.4], ]),
-        axes=[cfg, ]
-    )
+    # add_axes=dict(
+    #     init=dict(args=[[0.1, 0.1, 0.4, 0.4], ]),
+    #     axes=[cfg, ]
+    # )
 )
 
 import time
@@ -106,6 +109,6 @@ t = time.time()
 xy_plot = XyPlot(**axes_dict)
 print(time.time() - t)
 xy_plot.show()
-axes_dict.pop('set_rc')
-a = XyPlot(**axes_dict)
-a.show()
+# axes_dict.pop('set_rc')
+# a = XyPlot(**axes_dict)
+# a.show()

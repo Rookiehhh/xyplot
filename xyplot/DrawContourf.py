@@ -5,7 +5,7 @@ from .cfg_names import INIT_NAME
 
 __author__ = 'Rookie'
 __all__ = [
-    'ContourfDirector',     # 绘制contourf 等高线填色图(该模块的顶层设置者)
+    'ContourfDirector',     # 绘制contourf等高线填色图(该模块的顶层设置者)
     'ColorMapBuilder',      # 色阶颜色映射 colormap 构建设置类
     'DrawColorBar',         # 色卡构建设置类对象
 ]

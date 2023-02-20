@@ -51,8 +51,8 @@ class XyPlotDirector:
         if ADD_AXES_NAME in kwargs:
             self.figure = AddAxesBuilder(self.figure, **kwargs[ADD_AXES_NAME])()
         # 如果kwargs键中存在SET_FIG_NAME, 则调度SetFigure 方法构建
+        self.check()
         if SET_FIG_NAME in kwargs:
-            self.check()
             SetFigure(self.figure, **kwargs[SET_FIG_NAME])
         if SET_RC_NAME in kwargs:
             tmp_rc.revert()

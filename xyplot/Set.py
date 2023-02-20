@@ -19,10 +19,25 @@ class SetFigure(ModuleSetter):
     @xy_call()
     def native_api(self, figure: plt.Figure, **kwargs):
         """
+        通过画布对象figure的方法来对画布进行修改
+        Parameters
+        ----------
+        figure: 画布对象plt.Figure
+        kwargs: 相应的设置项, 具体包括:
+            height: 设置画布高度, 对应的方法接口对象为fig.set_figheight
+            width: 设置画布宽度, 对应的方法接口对象为fig.set_figwidth
+            edgecolor: 设置画布边框颜色, 对应的方法接口对象为fig.set_edgecolor
+            frameon: 设置是否显示边框, 对应的方法接口对象为fig.set_frameon
+            facecolor: 设置是否显示边框, 对应的方法接口对象为fig.set_facecolor
+            frameon: 设置画布背景色, 对应的方法接口对象为fig.set_frameon
+            dpi: 设置画布的分辨率, 对应的方法接口对象为fig.set_dpi
+            alpha: 画布透明度, 对应的方法接口对象为fig.set_alpha
+            legend: 添加画布图例, 对应的方法接口对象为fig.legend
+            title: 添加画布标题, 对应的方法接口对象为fig.suptitle
 
-        :param figure:
-        :param kwargs:
-        :return:
+        Returns
+        -------
+
         """
         return dict(
             height=figure.set_figheight,    # 设置画布高度
@@ -31,20 +46,25 @@ class SetFigure(ModuleSetter):
             frameon=figure.set_frameon,     # 设置是否显示边框
             facecolor=figure.set_facecolor,    # 设置画布背景色
             dpi=figure.set_dpi,  # 设置画布的分辨率
-            alpha=figure.set_alpha,  # 画布透明度
+            alpha=figure.set_alpha,  # 设置图像的透明度
 
             legend=figure.legend,   # 添加画布图例
-            title=figure.suptitle,  # 添加画布标题
-
+            title=figure.suptitle,  # 设置图像的主标题
+            subplots_adjust=figure.subplots_adjust,     # 调整子图之间的间距和边缘
         )
 
     @xy_call(XyPlotAdapter)
     def branch_api(self, figure: plt.Figure, **kwargs):
         """
 
-        :param figure:
-        :param kwargs:
-        :return:
+        Parameters
+        ----------
+        figure: 画布对象plt.Figure
+        kwargs
+
+        Returns
+        -------
+
         """
         return dict(
 
@@ -87,6 +107,10 @@ class SetAxes(ModuleSetter):
             ylabel=axes.set_ylabel,    # 设置y轴标签文本
             xlim=axes.set_xlim,    # 设置x轴数值显示范围
             ylim=axes.set_ylim,    # 设置y轴数值显示范围
+            xticks=axes.set_xticks,     # 设置x轴上的刻度位置
+            yticks=axes.set_yticks,     # 设置y轴上的刻度位置
+            xticklabels=axes.set_xticklabels,   # 设置x轴上的刻度标签文本
+            yticklabels=axes.set_yticklabels,   # 设置y轴上的刻度标签文本
             legend=axes.legend,    # 设置标示不同图形的文本标签图例
             text=axes.text,    # 添加图形内容细节的无指向型注释文本
             annotate=axes.annotate,    # 添加图形内容细节的指向型注释文本
@@ -96,6 +120,8 @@ class SetAxes(ModuleSetter):
             axhline=axes.axhline,  # 绘制平行于x轴的水平参考线
             axvline=axes.axvline,  # 绘制垂直于x轴的竖直参考线
             set_aspect=axes.set_aspect,    # 设置子区域的横纵比
+            tick_params=axes.tick_params,   # 设置刻度标签、刻度线、网格线等
+
         )
 
     @xy_call(XyPlotAdapter)
@@ -111,16 +137,29 @@ class SetAxes(ModuleSetter):
             patches=(SetPatches, axes),     # 绘制几何图形
             axis=(SetAxis, axes)    # 设置坐标轴: 包括轴脊、刻度线、刻度标签等
 
+
         )
 
 
 class SetPatches(ModuleSetter):
-    """
-
-    """
 
     @xy_call(XyPlotAdapter)
     def native_api(self, axes, **kwargs):
+        """
+
+        Parameters
+        ----------
+        axes: plt.Axes 对象
+        kwargs:
+            circle: 绘制圆, 对应的方法接口对象为matplotlib.patches.Circle
+            ellipse: 绘制椭圆, 对应的方法接口对象为matplotlib.patches.Ellipse
+            rectangle: 绘制矩形, 对应的方法接口对象为matplotlib.patches.Rectangle
+            arc: 绘制圆弧, 对应的方法接口对象为matplotlib.patches.Arc
+            wedge: 绘制楔形, 对应的方法接口对象为matplotlib.patches.Wedge
+        Returns
+        -------
+
+        """
         return dict(
             circle=(self.draw_circle, axes),    # 绘制圆
             ellipse=(self.draw_ellipse, axes),  # 绘制椭圆
