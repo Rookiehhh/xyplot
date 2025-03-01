@@ -1,0 +1,15 @@
+name: xyplot-env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - numpy>=1.20.0
+  - pandas>=1.3.0
+  - scipy>=1.7.0
+  - matplotlib>=3.5.0
+  - pip>=22.0.0
+  - pip:
+    - pytest>=7.0.0
+    - pylint>=2.12.0
+    - black>=22.0.0 

@@ -1,114 +1,79 @@
-from xyplot import XyPlot
+# main.py - 项目主入口
 import numpy as np
 import pandas as pd
 from scipy.interpolate import griddata
+import matplotlib.pyplot as plt
+from xyplot import XyPlot
+from utils import read_data, create_flow_field_config, create_sine_config
 
+def main():
+    try:
+        # 数据文件路径 - 修改为使用数据目录
+        file_path = r"data/P-L1-IMM-SWMF_20221018004619_0005M_SWMF.dat"
+        
+        # 读取数据
+        df = read_data(file_path)
+        
+        # 绘制复杂可视化
+        create_complex_visualization(df)
+        
+    except Exception as e:
+        print(f"错误: {e}")
+        print("显示基本正弦图示例...")
+        create_simple_visualization()
 
-def read_data(file):
-    with open(file, 'r') as f:
-        line_list = list(filter(lambda x: x[0] != '#', f.readlines()))
-    variables = line_list[1].strip().split("=")[1].replace('"', '').split(",")
-    data_list = []
-    for line in line_list[6:]:
-        try:
-            line_data = [float(i) for i in line.strip().split(" ") if i]
-        except:
-            continue
-        data_list.append(line_data)
-
-    return pd.DataFrame(columns=variables, data=data_list)
-
-
-file = r"P-L1-IMM-SWMF_20221018004619_0005M_SWMF.dat"
-df = read_data(file)
-# print(df.keys())
-x, y = df['X [R]'].values, df['Y [R]'].values
-xx = yy = np.linspace(-6.5, 6.5, 1000)
-X, Y = np.meshgrid(xx, yy)
-grid_data = griddata((x, y), df[df.keys()[7]].values, (X, Y), method="linear")  # 散点插值成网格数据
-U = griddata((x, y), df[df.keys()[8]].values, (X, Y), method="linear")  # 散点插值成网格数据
-V = griddata((x, y), df[df.keys()[9]].values, (X, Y), method="linear")  # 散点插值成网格数据
-
-x = np.linspace(-np.pi, np.pi, 100)
-y = np.sin(x)
-cfg = dict(
-    title=dict(args="SIN(X)", loc='left'),
-    xlabel=dict(args="x label", c='k'),
-    ylabel=dict(args=r'$\sin(x)$', c='k'),
-    # legend=dict(
-    #     loc='upper right',
-    # ),
-    # annotate=dict(text='Hello',xy=(0.3, 0.3), xytext=(0.5, 0.5), weight='bold', color='b',
-    #               arrowprops=dict(arrowstyle='->', connectionstyle='arc3', color='b')),
-    # grid=dict(linestyle=':', color='r'),
-    # text=(
-    #     dict(args=(-3.0, 0.0, "TEXT"), weight='bold', color='r', fontsize=20, fontfamily='sans-serif'),
-    #     dict(args=(0.5, 0., "text"), weight='bold', color='g', fontsize=20, fontfamily='sans-serif'),
-    # ),
-    # axhline=dict(y=0, c='g', ls='--', lw=2),
-    # axvline=dict(x=0, c='c', ls='-.', lw=2),
-    # axvspan=dict(xmin=1.0, xmax=2.0, facecolor='y', alpha=0.1),
-    # axhspan=dict(ymin=0.1, ymax=0.4, facecolor='r', alpha=0.1),
-    # plot=dict(args=(x, y), label=r'$y = \sin(x)$', c='k'),
-    # scatter=dict(args=([0, 1, -3, ], [.4, -.7, -.9]), label='scatter', color='r'),
-    streamplot=dict(args=(X, Y, grid_data, grid_data), density=1.5, linewidth=0.5, arrowsize=0.9, arrowstyle='->'),
-    aspect=True,
-    tick_params=dict(axis='x', labelrotation=45, ),
-    # fill=(
-    #     dict(args=([0, 1, 1, ], [0, -np.pi/2, np.pi/2, ]), c='k'),
-    # ),
-    Branch=dict(
-        contourf=dict(
-            init=dict(args=(X, Y, grid_data), levels=np.linspace(0, 30, 50), extend="both", cmap=dict(
-                              init=dict(
-                                  name='chaos',
-                                  colors=['black', 'purple', 'blue', 'cyan', 'green', 'yellow', 'orange', 'red'], N=100),
-                              under='k', over='r'),
-                      ),
-            cbar=dict(
-                init=dict(shrink=0.8, ticks=np.linspace(0, 30, 11), orientation='horizontal'),
-                ax=dict(title=dict(args='title', c='y'), xlabel='123', ylabel='EEE',)
-            )
-        ),
-        patches=dict(
-            wedge=(
-                dict(center=(0, 0), r=1, theta1=90, theta2=270, color='k',),
-                dict(center=(0, 0), r=1, theta1=-90, theta2=90, edgecolor='k', facecolor='w'),
-            )
-        ),
-        axis=dict(
-            spines=dict(top=dict(position=dict(args=(('data', 0), )), color='b')),
-            xaxis=dict(label_coords=dict(args=(1, -0.05), ), tick_params=dict(color='b'),))
+def create_complex_visualization(df):
+    """创建复杂流场可视化"""
+    # 网格数据准备
+    x, y = df['X [R]'].values, df['Y [R]'].values
+    xx = yy = np.linspace(-6.5, 6.5, 1000)
+    X, Y = np.meshgrid(xx, yy)
+    grid_data = griddata((x, y), df[df.keys()[7]].values, (X, Y), method="linear")
+    U = griddata((x, y), df[df.keys()[8]].values, (X, Y), method="linear")
+    V = griddata((x, y), df[df.keys()[9]].values, (X, Y), method="linear")
+    
+    # 创建流场配置
+    cfg_flow = create_flow_field_config(X, Y, U, V, grid_data)
+    
+    # 创建正弦图配置
+    cfg_sin = create_sine_config()
+    
+    # 多子图布局
+    fig_dict = dict(
+        height=10, width=15,
+        title=dict(args='XyPlot 演示'),
     )
-)
+    
+    axes_dict = dict(
+        set_fig=fig_dict,
+        axes=dict(
+            init=(dict(args=(1, 2, 1), ), 122),
+            axes=(cfg_flow, cfg_sin)
+        )
+    )
+    
+    # 创建并显示图表
+    xy_plot = XyPlot(**axes_dict)
+    xy_plot.show()
 
+def create_simple_visualization():
+    """创建简单的正弦函数可视化"""
+    x = np.linspace(-np.pi, np.pi, 100)
+    y = np.sin(x)
+    
+    set_fig_dict = dict(height=8, width=10)
+    axes_dict = dict(
+        plot=dict(args=(x, y), label='y=sin(x)', c='r', lw=2),
+        title=r'y=sin(x)',
+        grid=dict(linestyle=':', color='gray'),
+        xlabel="x",
+        ylabel="y",
+        legend=dict(loc='upper right'),
+    )
+    
+    cfg = dict(set_fig=set_fig_dict, axes=axes_dict)
+    xyplt = XyPlot(**cfg)
+    xyplt.show()
 
-fig_dit = dict(height=10, width=10,
-               # facecolor='k', edgecolor='k',
-               legend=dict(loc='upper right'), frameon=True, title=dict(args='XY PLOT',),)
-set_rc = {
-    'figure.facecolor': 'k', 'axes.labelcolor': 'w', 'axes.titlecolor': 'w', 'ytick.color': 'w', 'xtick.color': 'w'
-}
-axes_dict = dict(
-    # set_rc=set_rc,
-    set_fig=fig_dit,
-    axes=dict(
-        # init=(dict(args=(2, 2, 1), ), 122),
-        axes=(cfg,
-              # dict(plot=dict(args=(x, y), color='r', label='???'), legend=dict(loc='lower right'), grid={})
-              )
-    ),
-    # add_axes=dict(
-    #     init=dict(args=[[0.1, 0.1, 0.4, 0.4], ]),
-    #     axes=[cfg, ]
-    # )
-)
-
-import time
-t = time.time()
-xy_plot = XyPlot(**axes_dict)
-print(time.time() - t)
-xy_plot.show()
-# axes_dict.pop('set_rc')
-# a = XyPlot(**axes_dict)
-# a.show()
+if __name__ == "__main__":
+    main()
